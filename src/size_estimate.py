@@ -68,6 +68,32 @@ def compute_forward_memory(model, input_shape, device):
     """
     
     # TODO: fill-in (start)
-    raise NotImplementedError
+    # raise NotImplementedError
     # TODO: fill-in (end)
+    memory_usage = []
+
+    def hook_fn(m, input, output):
+        if isinstance(output, (tuple, list)):
+            for o in output:
+                memory_usage.append(o.nelement() * o.element_size())
+        else:
+            memory_usage.append(output.nelement() * output.element_size())
+        
+        for i in input:
+            if isinstance(i, torch.Tensor):
+                memory_usage.append(i.nelement() * i.element_size())
+
+    hooks = []
+    for layer in model.modules():
+        hooks.append(layer.register_forward_hook(hook_fn))
+    
+    input_tensor = torch.rand((1, *input_shape), device=device)
+    with torch.no_grad():
+        model(input_tensor)
+    
+    for hook in hooks:
+        hook.remove()
+
+    total_memory_usage = sum(memory_usage)
+    return total_memory_usage
 
