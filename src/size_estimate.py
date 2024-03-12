@@ -55,7 +55,7 @@ def count_trainable_parameters(model):
     # TODO: fill-in (start)
     # raise NotImplementedError
     # TODO: fill-in (end)
-    return sum(p.numel() for p in model.parameters() if p.require_grad())
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 
 def compute_forward_memory(model, input_shape, device):
