@@ -53,8 +53,9 @@ def count_trainable_parameters(model):
     :return:
     """
     # TODO: fill-in (start)
-    raise NotImplementedError
+    # raise NotImplementedError
     # TODO: fill-in (end)
+    return sum(p.numel() for p in model.parameters() if p.require_grad())
 
 
 def compute_forward_memory(model, input_shape, device):
