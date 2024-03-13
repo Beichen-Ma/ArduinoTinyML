@@ -15,7 +15,7 @@ def flop(model, input_shape, device):
                 # TODO: fill-in (start)
                 raise NotImplementedError
                 # TODO: fill-in (end)
-
+                
             if isinstance(module, nn.Conv2d):
                 # TODO: fill-in (start)
                 raise NotImplementedError
@@ -70,6 +70,7 @@ def compute_forward_memory(model, input_shape, device):
     # TODO: fill-in (start)
     # raise NotImplementedError
     # TODO: fill-in (end)
+    # Register hook to capture memory usage of intermediate tensors
     memory_usage = []
 
     def hook_fn(m, input, output):
@@ -87,7 +88,7 @@ def compute_forward_memory(model, input_shape, device):
     for layer in model.modules():
         hooks.append(layer.register_forward_hook(hook_fn))
     
-    input_tensor = torch.rand((1, *input_shape), device=device)
+    input_tensor = torch.rand(*input_shape).to(device)
     with torch.no_grad():
         model(input_tensor)
     
@@ -96,4 +97,3 @@ def compute_forward_memory(model, input_shape, device):
 
     total_memory_usage = sum(memory_usage)
     return total_memory_usage
-
