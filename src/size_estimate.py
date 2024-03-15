@@ -13,8 +13,9 @@ def flop(model, input_shape, device):
             batch_size = input[0].shape[0]
             if isinstance(module, nn.Linear):
                 # TODO: fill-in (start)
-                raise NotImplementedError
+                # raise NotImplementedError
                 # TODO: fill-in (end)
+                
                 
             if isinstance(module, nn.Conv2d):
                 # TODO: fill-in (start)
@@ -71,29 +72,38 @@ def compute_forward_memory(model, input_shape, device):
     # raise NotImplementedError
     # TODO: fill-in (end)
     # Register hook to capture memory usage of intermediate tensors
-    memory_usage = []
+    
+    input_tensor = torch.rand(input_shape).to(device)
+    input_mem = np.prod(input_shape) * 4
+    model = model.to(device)
+    output_mem = np.prod(model(input_tensor).size()) * 4
 
-    def hook_fn(m, input, output):
-        if isinstance(output, (tuple, list)):
-            for o in output:
-                memory_usage.append(o.nelement() * o.element_size())
-        else:
-            memory_usage.append(output.nelement() * output.element_size())
+    return input_mem + output_mem
+
+
+    # memory_usage = []
+
+    # def hook_fn(m, input, output):
+    #     if isinstance(output, (tuple, list)):
+    #         for o in output:
+    #             memory_usage.append(o.nelement() * o.element_size())
+    #     else:
+    #         memory_usage.append(output.nelement() * output.element_size())
         
-        for i in input:
-            if isinstance(i, torch.Tensor):
-                memory_usage.append(i.nelement() * i.element_size())
+    #     for i in input:
+    #         if isinstance(i, torch.Tensor):
+    #             memory_usage.append(i.nelement() * i.element_size())
 
-    hooks = []
-    for layer in model.modules():
-        hooks.append(layer.register_forward_hook(hook_fn))
+    # hooks = []
+    # for layer in model.modules():
+    #     hooks.append(layer.register_forward_hook(hook_fn))
     
-    input_tensor = torch.rand(*input_shape).to(device)
-    with torch.no_grad():
-        model(input_tensor)
+    # input_tensor = torch.rand(*input_shape).to(device)
+    # with torch.no_grad():
+    #     model(input_tensor)
     
-    for hook in hooks:
-        hook.remove()
+    # for hook in hooks:
+    #     hook.remove()
 
-    total_memory_usage = sum(memory_usage)
-    return total_memory_usage
+    # total_memory_usage = sum(memory_usage)
+    # return total_memory_usage
