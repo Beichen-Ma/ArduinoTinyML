@@ -18,8 +18,9 @@ class ste_round(torch.autograd.Function):
     @staticmethod
     def backward(ctx, grad_output):
         # TODO: fill-in (start)
-        raise NotImplementedError
+        # raise NotImplementedError
         # TODO: fill-in (end)
+        return torch.tensor([grad_output])
 
 
 # Get percnetile min max
@@ -69,8 +70,9 @@ def linear_quantize(input, scale, zero_point):
     zero_pint: shift for quantization
     """
     # TODO: fill-in (start)
-    raise NotImplementedError
+    # raise NotImplementedError
     # TODO: fill-in (end)
+    output = ste_round().forward(None, input / scale) + zero_point
     return output
 
 
@@ -138,8 +140,9 @@ class SymmetricQuantFunction(torch.autograd.Function):
         zero_point = 0
 
         # TODO: fill-in (start)
-        raise NotImplementedError
+        # raise NotImplementedError
         # TODO: fill-in (end)
+        output = torch.clamp(ste_round().forward(ctx, x/scale), -2**(k-1), 2**(k-1) - 1)
         return output
 
 
@@ -179,8 +182,9 @@ class AsymmetricQuantFunction(torch.autograd.Function):
             raise ValueError("The QuantFunction requires a pre-calculated zero point")
 
         # TODO: fill-in (start)
-        raise NotImplementedError
+        # raise NotImplementedError
         # TODO: fill-in (end)
+        output = torch.clamp(ste_round().forward(ctx, x/scale + zero_point), 0, 2**k - 1)
         return output
 
     @staticmethod
@@ -222,12 +226,16 @@ class QConfig(object):
         with torch.no_grad():
             if self.is_symmetric:
                 # TODO: fill-in (start)
-                raise NotImplementedError
+                # raise NotImplementedError
                 # TODO: fill-in (end)
+                scale = torch.abs(saturation_max) / (2**(self.quant_bits-1)-1)
+                zero_point = torch.tensor(0, dtype=torch.float32)
             else:
                 # TODO: fill-in (start)
-                raise NotImplementedError
+                # raise NotImplementedError
                 # TODO: fill-in (end)
+                scale = torch.abs(saturation_max - saturation_min) / (2**self.quant_bits-1)
+                zero_point = ste_round().forward(None, (-saturation_min)/scale)
         return scale, zero_point
 
     def quantize_with_params(self, x, scale, zero_point, fake_quantize=False):
@@ -306,8 +314,9 @@ def quantize_weights_bias(w, qconfig, fake_quantize=False):
     """
 
     # TODO: fill-in (start)
-    raise NotImplementedError
+    # raise NotImplementedError
     # TODO: fill-in (end)
+    w_q = qconfig.quantize_with_min_max(w, torch.min(w.data.detach()), torch.max(w.data.detach()), fake_quantize)
 
     return w_q
 
@@ -324,11 +333,14 @@ def conv2d_linear_quantized(
     assert a_qconfig is not None and w_qconfig is not None
     if module.bias is not None:
         assert b_qconfig is not None
-
+        module.bias.data = quantize_weights_bias(module.bias, b_qconfig, fake_quantize=True)
     # TODO: fill-in (start)
-    raise NotImplementedError
+    # raise NotImplementedError
     # TODO: fill-in (end)
-
+    x_q = quantize_activations(x, a_qconfig, fake_quantize=True)
+    module.weight.data = quantize_weights_bias(module.weight, w_qconfig, fake_quantize=True)
+    y = module(x_q)
+    
     return y
 
 

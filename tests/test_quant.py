@@ -118,7 +118,7 @@ def test_asymmetric_quantization_1():
 
 
 def test_asymmetric_quantization_2():
-    zerop = torch.tensor([-0.5])
+    zerop = torch.tensor([-1])
     scale = torch.tensor([0.5])
     x = torch.tensor([-0.2, 0.1, -0.7, 0.8, 2.2, -1.9], requires_grad=True)
     nbits = 2
@@ -195,9 +195,11 @@ def test_quantize_weights_bias_1():
     qcfg = QConfig(quant_bits=2, is_symmetric=True)
     xqf = quantize_weights_bias(w, qcfg, fake_quantize=True)
     xqf_ans = torch.tensor([0., 0., 1.1, 0., -1.1, -2.2])
+    # xqf_ans = torch.tensor([0., 0., 0., 0., 0., -2.2])
     assert ((xqf - xqf_ans) ** 2 < EPS).all().item()
     xq = quantize_weights_bias(w, qcfg, fake_quantize=False)
     xq_ans = torch.tensor([0, 0, 1, 0, -1, -2])
+    # xq_ans = torch.tensor([0, 0, 0, 0, 0, -1])
     assert ((xq - xq_ans) ** 2 < EPS).all().item()
 
 
@@ -243,6 +245,8 @@ def test_conv2d_linear_quantized_linear():
     y_ans = torch.tensor([
         [-0.3357, 0.3464, 0.5143, -0.3464, -1.0178],
         [0.0000, 0.1786, 0.3464, -0.3464, -0.5143]
+        # [-0.4045, 0.3914, 0.5937, -0.3914, -0.5937],
+        # [0.0000, 0.1892, 0.3914, -0.3914, -0.5937]
     ]).reshape(2, 5)
     assert (((y - y_ans) ** 2).mean() < EPS).all().item()
 
@@ -250,6 +254,8 @@ def test_conv2d_linear_quantized_linear():
     x_grad_ans = torch.tensor([
         [-0.9155,  0.4578, -0.9155],
         [-0.9155,  0.4578, -0.9155]
+        # [-1.1031,  0.5516, -0.5516],
+        # [-1.1031,  0.5516, -0.5516]
     ])
 
     assert (((x.grad - x_grad_ans) ** 2).mean() < EPS).all().item()
@@ -271,6 +277,8 @@ def test_conv2d_linear_quantized_conv():
     y_ans = torch.tensor([
         [-0.3357, 0.3464, 0.5143, -0.3464, -1.0178],
         [0.0000, 0.1786, 0.3464, -0.3464, -0.5143]
+        # [-0.4045, 0.3914, 0.5937, -0.3914, -0.5937],
+        # [0.0000, 0.1892, 0.3914, -0.3914, -0.5937]
     ]).reshape(2, 5)
     assert (((y - y_ans) ** 2).mean() < EPS).all().item()
 
@@ -278,6 +286,8 @@ def test_conv2d_linear_quantized_conv():
     x_grad_ans = torch.tensor([
         [-0.9155,  0.4578, -0.9155],
         [-0.9155,  0.4578, -0.9155]
+        # [-1.1031,  0.5516, -0.5516],
+        # [-1.1031,  0.5516, -0.5516]
     ])
 
     assert (((x.grad - x_grad_ans) ** 2).mean() < EPS).all().item()

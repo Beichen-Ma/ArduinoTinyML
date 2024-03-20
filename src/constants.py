@@ -75,10 +75,11 @@ GIT_DIR = os.getcwd()
 # Sets up folder in student's Google Drive
 # DRIVE_DIR = "/gdrive/MyDrive/ece5545/a2"
 DRIVE_DIR = os.getcwd()
+COLAB_DIR = '/content'
 
 # The directory where the dataset will be downloaded
 # You can change this value, but please keep it in the same directory with other files from this lab
-DATASET_DIR = DRIVE_DIR + '/dataset'
+DATASET_DIR = COLAB_DIR + '/dataset'
 
 # Model dirs
 # Pathes to directories where trained models are saved

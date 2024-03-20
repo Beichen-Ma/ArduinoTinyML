@@ -8,30 +8,35 @@ def flop(model, input_shape, device):
 
     def count_flops(name):
         def hook(module, input, output):
-            "Hook that calculates number of floating point operations"
+            "Hook that calculates the number of floating point operations"
             flops = {}
             batch_size = input[0].shape[0]
             if isinstance(module, nn.Linear):
-                # TODO: fill-in (start)
-                # raise NotImplementedError
-                # TODO: fill-in (end)
-                
-                
+                input_features = module.in_features
+                output_features = module.out_features
+                bias_ops = output_features if module.bias is not None else 0
+                flops[module] = batch_size * (2 * input_features * output_features + bias_ops)
+
             if isinstance(module, nn.Conv2d):
-                # TODO: fill-in (start)
-                raise NotImplementedError
-                # TODO: fill-in (end)
+                in_channels = module.in_channels
+                out_channels = module.out_channels
+                kernel_h, kernel_w = module.kernel_size
+                output_height, output_width = output.shape[2:]
+                groups = module.groups
+                bias_ops = out_channels if module.bias is not None else 0
+                flops[module] = batch_size * ((2 * kernel_h * kernel_w * in_channels // groups) * output_height * output_width * out_channels + bias_ops)
 
-            if isinstance(module, nn.BatchNorm1d):
-                # TODO: fill-in (end)
-                raise NotImplementedError
-                # TODO: fill-in (end)
+            if isinstance(module, nn.BatchNorm1d) or isinstance(module, nn.BatchNorm2d):
+                num_elements = input[0].numel()  
+                affine_ops = 2 * num_elements if module.affine else 0  
+                flops[module] = 2 * num_elements + affine_ops  
 
-            if isinstance(module, nn.BatchNorm2d):
-                # TODO: fill-in (end)
-                raise NotImplementedError
-                # TODO: fill-in (end)
+            if isinstance(module, nn.Softmax):
+                num_elements = input[0].numel()  
+                flops[module] = 3 * num_elements  
+
             total[name] = flops
+        
         return hook
 
     handle_list = []
@@ -45,7 +50,6 @@ def flop(model, input_shape, device):
     for handle in handle_list:
         handle.remove()
     return total
-
 
 def count_trainable_parameters(model):
     """
@@ -79,31 +83,3 @@ def compute_forward_memory(model, input_shape, device):
     output_mem = np.prod(model(input_tensor).size()) * 4
 
     return input_mem + output_mem
-
-
-    # memory_usage = []
-
-    # def hook_fn(m, input, output):
-    #     if isinstance(output, (tuple, list)):
-    #         for o in output:
-    #             memory_usage.append(o.nelement() * o.element_size())
-    #     else:
-    #         memory_usage.append(output.nelement() * output.element_size())
-        
-    #     for i in input:
-    #         if isinstance(i, torch.Tensor):
-    #             memory_usage.append(i.nelement() * i.element_size())
-
-    # hooks = []
-    # for layer in model.modules():
-    #     hooks.append(layer.register_forward_hook(hook_fn))
-    
-    # input_tensor = torch.rand(*input_shape).to(device)
-    # with torch.no_grad():
-    #     model(input_tensor)
-    
-    # for hook in hooks:
-    #     hook.remove()
-
-    # total_memory_usage = sum(memory_usage)
-    # return total_memory_usage
