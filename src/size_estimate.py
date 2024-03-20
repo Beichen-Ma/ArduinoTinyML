@@ -24,7 +24,7 @@ def flop(model, input_shape, device):
                 out_w = output.shape[3]
                 k_ops = 2 * module.kernel_size[0] * module.kernel_size[1] * (in_channels // module.groups)
                 bias_ops = out_channels if module.bias is not None else 0
-                flops[module] = batch_size *  (k_ops * out_h * out_w + out_h * out_w) * bias_ops
+                flops[module] = batch_size *  (k_ops * out_h + bias_ops) * out_w + out_h * out_w
 
             if isinstance(module, nn.BatchNorm1d) or isinstance(module, nn.BatchNorm2d):
                 num_elements = input[0].numel()  
