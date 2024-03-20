@@ -18,23 +18,13 @@ def flop(model, input_shape, device):
                 flops[module] = batch_size * (2 * input_features * output_features + bias_ops)
 
             if isinstance(module, nn.Conv2d):
-                # in_channels = module.in_channels
-                # out_channels = module.out_channels
-                # kernel_h, kernel_w = module.kernel_size
-                # output_height, output_width = output.shape[2:]
-                # groups = module.groups
-                # bias_ops = out_channels if module.bias is not None else 0
-                # flops[module] = batch_size * ((2 * kernel_h * kernel_w * in_channels // groups) * output_height * output_width * out_channels + bias_ops)
-                in_channels = module.in_channels
-                out_channels = module.out_channels
-                kernel_h, kernel_w = module.kernel_size
-                output_height, output_width = output.shape[2:]
-                groups = module.groups
-                # Correcting the calculation here
-                conv_ops = batch_size * (kernel_h * kernel_w * in_channels // groups) * output_height * output_width * out_channels
-                bias_ops = output_height * output_width * out_channels if module.bias is not None else 0
-                flops[module] = (2 * conv_ops) + bias_ops  
-
+                in_channels = input[0].shape[1]
+                out_channels = output.shape[1]
+                out_h = output.shape[2]
+                out_w = output.shape[3]
+                k_ops = 2 * module.kernel_size[0] * module.kernel_size[1] * (in_channels // module.groups)
+                bias_ops = out_channels if module.bias is not None else 0
+                flops[module] = batch_size *  (k_ops * out_h * out_w + out_h * out_w) * bias_ops
 
             if isinstance(module, nn.BatchNorm1d) or isinstance(module, nn.BatchNorm2d):
                 num_elements = input[0].numel()  
