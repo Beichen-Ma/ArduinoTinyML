@@ -25,7 +25,7 @@ In this section, we recorded and visualized the sound bites. The audio is plotte
   <img src="./images/different_spectograms.png", width = "50%", height="50%", class="center" />
 </p>
 
-## Part 2: Model Size Estimation <a name="size" /> 
+## Section 2: Model Size Estimation <a name="size" /> 
 MCUs have limited memory and processing power. Before deploying the model to the MCU we calculated its estimated RAM and flash usage and report the number of FLOPS of the model during a forward pass (for inference).
 
 | Layer               | FLOPs      |
