@@ -17,7 +17,7 @@ In this project, we trained and deployed an audio processing neural network on A
 6. [Pruning](#pruning)
 
 
-## Part 1: Preprocessing: Audio Recording and Visualization<a name="preprocessing" />
+## Section 1: Preprocessing: Audio Recording and Visualization<a name="preprocessing" />
 In this section, we recorded and visualized the sound bites. The audio is plotted in the time domain and frequency domain and as a spectrogram, a mel spectrogram, and lastly a mel frequency cepstral coefficients (MFCC) spectrogram as shown in Figure 1 and Figure 2. The result shows how signal transformations enable machine learning algorithms to better extract and utilize features.
 
 <p align="center">
@@ -42,14 +42,14 @@ Furthermore, we benchmarked the speed of the DNN on server-grade CPU and GPU to 
 | Tesla V100-SXM2-16GB  | -             | 28.000 us      |
 
 
-## Part 3: Training & Analysis<a name="training" />
+## Section 3: Training & Analysis<a name="training" />
 We train the model and report the accuracy after we have verified that the model could fit on our MCU. 
 
 <p align="center">
   <img src="./images/acc_epoch.png", width = "50%", height="50%", class="center" />
 </p>
 
-## Part 4: Model Conversion and Deployment<a name="conversion" />
+## Section 4: Model Conversion and Deployment<a name="conversion" />
 Our model has been trained using the PyTorch framework, but the MCU only supports TFLite Micro. While converting to a TFLite model, we quantized the model to reduce its memory and computation. 
 
 Profile running time and plot the breakdown between preprocessing, neural network, and post-processing on arduino and the result is shown below. The MCU has an average inference time of 86 ms, whereas the Intel Xeon CPU and Tesla V100 times are 14.761 ms and 28.000 us respectively. To facilitate a direct comparison, the GPU time is converted to milliseconds, resulting in 0.028 ms. These calculations indicate that the MCU is approximately 4.83 times slower than the Intel Xeon CPU and 3070.43 times slower than the Tesla V100 GPU during the inference phase of a deep neural network operation.
@@ -68,7 +68,7 @@ We implemented a full precision (float 32) model which was quantized after train
   <img src="./images/acc_bit.png", width = "50%", height="50%", class="center" />
 </p>
 
-## Part 6: Pruning<a name="pruning" />
+## Section 6: Pruning<a name="pruning" />
 Pruning is another machine learning tactic that can help reduce model size and increase computational efficieny by removing unused parameters in neural networks. Pruning can remove groups of weights in **structured pruning** or individual weights in **unstructured pruning**. We implement both structured and unstructured pruning, and measure the impact on accuracy. 
 
 1. For unstructured pruning:
